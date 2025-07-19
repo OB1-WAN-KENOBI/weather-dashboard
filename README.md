@@ -51,7 +51,7 @@ npm run dev
 
 ## 🌐 Демо
 
-Посетите: [[https://your-username.github.io/weather-dashboard]([https://your-username.github.io/weather-dashboard](https://ob1-wan-kenobi.github.io/weather-dashboard/))](https://ob1-wan-kenobi.github.io/weather-dashboard/)
+Посетите: https://ob1-wan-kenobi.github.io/weather-dashboard/
 
 ## 📱 Использование
 

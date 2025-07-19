@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="ru">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Тест геолокации</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      max-width: 600px;
+      margin: 50px auto;
+      padding: 20px;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      min-height: 100vh;
+    }
+
+    .container {
+      background: rgba(255, 255, 255, 0.1);
+      padding: 30px;
+      border-radius: 15px;
+      backdrop-filter: blur(10px);
+    }
+
+    button {
+      background: rgba(255, 255, 255, 0.2);
+      border: 2px solid rgba(255, 255, 255, 0.3);
+      color: white;
+      padding: 15px 30px;
+      border-radius: 10px;
+      cursor: pointer;
+      font-size: 16px;
+      margin: 10px;
+      transition: all 0.3s ease;
+    }
+
+    button:hover {
+      background: rgba(255, 255, 255, 0.3);
+      transform: translateY(-2px);
+    }
+
+    .result {
+      margin-top: 20px;
+      padding: 15px;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 10px;
+      white-space: pre-wrap;
+    }
+
+    .error {
+      background: rgba(255, 100, 100, 0.3);
+    }
+
+    .success {
+      background: rgba(100, 255, 100, 0.3);
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+    <h1>🌍 Тест геолокации</h1>
+    <p>Эта страница поможет проверить, работает ли геолокация в вашем браузере.</p>
+
+    <button onclick="testGeolocation()">📍 Получить местоположение</button>
+    <button onclick="testWithOptions()">⚙️ Тест с настройками</button>
+    <button onclick="clearResults()">🗑️ Очистить</button>
+
+    <div id="results" class="result"></div>
+  </div>
+
+  <script>
+    function log(message, type = 'info') {
+      const results = document.getElementById('results');
+      const timestamp = new Date().toLocaleTimeString();
+      const className = type === 'error' ? 'error' : type === 'success' ? 'success' : '';
+
+      results.innerHTML += `<div class="${className}">[${timestamp}] ${message}</div>`;
+      results.scrollTop = results.scrollHeight;
+    }
+
+    function clearResults() {
+      document.getElementById('results').innerHTML = '';
+    }
+
+    function testGeolocation() {
+      log('📍 Начинаем тест геолокации...');
+
+      if (!navigator.geolocation) {
+        log('❌ Геолокация не поддерживается в этом браузере', 'error');
+        return;
+      }
+
+      log('✅ Геолокация поддерживается');
+      log('🔍 Запрашиваем местоположение...');
+
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          log('✅ УСПЕХ! Местоположение получено:', 'success');
+          log(`📍 Широта: ${position.coords.latitude}`);
+          log(`📍 Долгота: ${position.coords.longitude}`);
+          log(`📍 Точность: ${position.coords.accuracy} метров`);
+          log(`📍 Высота: ${position.coords.altitude || 'недоступна'}`);
+          log(`📍 Скорость: ${position.coords.speed || 'недоступна'}`);
+          log(`📍 Направление: ${position.coords.heading || 'недоступно'}`);
+        },
+        (error) => {
+          log(`❌ ОШИБКА геолокации:`, 'error');
+          log(`🔍 Код ошибки: ${error.code}`);
+          log(`📝 Сообщение: ${error.message}`);
+
+          switch (error.code) {
+            case 1:
+              log('💡 Проблема: Доступ запрещен пользователем', 'error');
+              log('💡 Решение: Разрешите доступ к местоположению в настройках браузера');
+              break;
+            case 2:
+              log('💡 Проблема: Местоположение недоступно', 'error');
+              log('💡 Возможные причины:');
+              log('   - Сервисы геолокации заблокированы');
+              log('   - Проблемы с интернетом');
+              log('   - Блокировка на localhost');
+              break;
+            case 3:
+              log('💡 Проблема: Превышено время ожидания', 'error');
+              log('💡 Решение: Попробуйте еще раз');
+              break;
+            default:
+              log('💡 Неизвестная ошибка', 'error');
+          }
+        },
+        {
+          enableHighAccuracy: true,
+          timeout: 10000,
+          maximumAge: 60000
+        }
+      );
+    }
+
+    function testWithOptions() {
+      log('⚙️ Тестируем с отключенной высокой точностью...');
+
+      if (!navigator.geolocation) {
+        log('❌ Геолокация не поддерживается', 'error');
+        return;
+      }
+
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          log('✅ УСПЕХ с низкой точностью!', 'success');
+          log(`📍 Широта: ${position.coords.latitude}`);
+          log(`📍 Долгота: ${position.coords.longitude}`);
+          log(`📍 Точность: ${position.coords.accuracy} метров`);
+        },
+        (error) => {
+          log(`❌ Ошибка даже с низкой точностью: ${error.message}`, 'error');
+        },
+        {
+          enableHighAccuracy: false,
+          timeout: 15000,
+          maximumAge: 300000
+        }
+      );
+    }
+
+    // Автоматический тест при загрузке
+    window.addEventListener('load', () => {
+      log('🚀 Страница загружена');
+      log(`🌐 URL: ${window.location.href}`);
+      log(`🔒 Протокол: ${window.location.protocol}`);
+      log(`🏠 Хост: ${window.location.hostname}`);
+
+      if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+        log('⚠️ ВНИМАНИЕ: Вы на localhost!', 'error');
+        log('💡 Геолокация может не работать на localhost');
+        log('💡 Попробуйте использовать публичный URL');
+      }
+    });
+  </script>
+</body>
+
+</html>
